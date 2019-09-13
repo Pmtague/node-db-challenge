@@ -11,7 +11,10 @@ server.use(express.json());
 server.get('/api/projects', (req, res) => {
 	Project.findProjects()
 		.then(projects => {
-			res.status(200).json(projects)
+			let projArr = projects.map(project => {
+				return { ...project, complete: project.complete === 1 ? true : false }
+			})
+			res.status(200).json(projArr)
 		})
 		.catch(err => {
 			console.log(err);
@@ -31,6 +34,22 @@ server.post('/api/projects', (req, res) => {
 			res.status(500).json({ error: 'Could not create new project' })
 		})
 })
+
+server.get('/api/projects/:id', (req, res) => {
+	const id = req.params.id;
+
+	Project.findProjectById(id)
+	.then(project => {
+		console.log(project)
+		let boolean =  {...project, complete: project.complete === 1 ? true : false} 
+		res.status(200).json(boolean)
+	})
+	.catch(err => {
+		console.log(err);
+	    	res.status(500).json({ error: 'Could not find project with that ID' });
+	});
+    });
+
 server.get('/api/resources', (req, res) => {
 	Project.findResources()
 		.then(resources => {
@@ -39,8 +58,8 @@ server.get('/api/resources', (req, res) => {
 		.catch(err => {
 			console.log(err);
 			res.status(500).json({ error: 'Could not retrieve resources' })
-		})
-})
+		});
+});
 
 server.post('/api/resources', (req, res) => {
 	const resourceData = req.body;
@@ -51,23 +70,26 @@ server.post('/api/resources', (req, res) => {
 		})
 		.catch(err => {
 			console.log(err);
-			res.status(500).json({ error: 'Could not create resource' })
-		})
-})
+			res.status(500).json({ error: 'Could not create resource' });
+		});
+});
 server.get('/api/projects/:id/tasks', (req, res) => {
 	const { id } = req.params;
 
 	Project.findTasks(id)
 		.then(tasks => {
 			if(tasks.length) {
-				res.status(200).json(tasks)
+				let taskArr = tasks.map(task => {
+					return { ...task, completed: task.completed === 1 ? true : false }
+				})
+				res.status(200).json(taskArr);
 			} else {
-				res.status(404).json({ message: 'Could not find tasks for this project' })
+				res.status(404).json({ message: 'Could not find tasks for this project' });
 			}
 		})
 		.catch(err => {
 			console.log(err);
-			res.status(500).json({ error: 'Could not retrieve tasks' })
+			res.status(500).json({ error: 'Could not retrieve tasks' });
 		});
 });
 
@@ -83,14 +105,14 @@ server.post('/api/projects/:id/tasks', (req, res) => {
 						res.status(201).json(task);
 					})
 			} else {
-				res.status(404).json({ error: 'Could not find project with that ID' })
+				res.status(404).json({ error: 'Could not find project with that ID' });
 			}
 		})
 		.catch(err => {
 			console.log(err);
-			res.status(500).json({ error: 'Could not add task' })
-		})
-})
+			res.status(500).json({ error: 'Could not add task' });
+		});
+});
 
 
 

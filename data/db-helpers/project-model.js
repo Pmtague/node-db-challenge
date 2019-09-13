@@ -24,11 +24,11 @@ function findResources() {
 	return db('resources');
 };
 
-function findTasks() {
+function findTasks(id) {
 	return db('projects as p')
 			.join('tasks as t', 't.project_id', 'p.id')
 			.where({ project_id: id })
-			.select('p.project_name', 'p.description', 't.task_name', 't.description', 't.notes', 't.completed')
+			.select('p.project_name', 'p.description', 't.description', 't.notes', 't.completed')
 };
 
 function addProject(project) {
